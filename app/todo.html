@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <title>Todo | Yadi Apriyadi</title>
+  </head>
+  <body>
+    <div class="w-3/6 m-auto mt-32 flex justify-center items-center flex-col">
+      <div class="mb-12">
+        <h1
+          class="text-center inline-block py-2 rounded-lg text-white font-bold uppercase px-5 text-lg bg-emerald-400"
+        >
+          Todos
+        </h1>
+      </div>
+      <form action="/proses-todo" method="post" class="mb-5">
+        <input
+          name="todo"
+          type="text"
+          placeholder="Insert your Todo"
+          id="inputTodo"
+          class="bg-sky-200 rounded-lg py-2 px-5 w-80"
+        />
+        <button
+          type="submit"
+          class="rounded-lg text-white bg-emerald-800 py-2 px-5 shadow-lg ease-in duration-300 hover:shadow-emerald-800/50"
+        >
+          Add
+        </button>
+      </form>
+      <ul class="mt-5">
+        {{range $index, $todo := .Todos}}
+        <li class="flex justify-center items-center gap-3">
+          <form action="/done-todo" method="post">
+            <input hidden type="text" name="todoIndexHidden" id="todoIndex" />
+            <input
+              type="checkbox"
+              style="width: 15px; height: 15px"
+              name="todoIndex{{$index}}"
+              class="mt-2"
+              {{if
+              $todo.Done}}
+              checked
+              {{end}}
+              onchange="onChangeTodo(this, '{{$index}}')"
+            />
+            <button id="doneBtnTodo" type="submit" style="opacity: 1"></button>
+          </form>
+          <p class="text-lg {{if $todo.Done}} line-through {{end}}">
+            {{$todo.Title}}
+          </p>
+        </li>
+        {{end}}
+      </ul>
+    </div>
+    <script>
+      const inputTodo = document.getElementById('inputTodo');
+      const doneBtnTodo = document.getElementById('doneBtnTodo');
+
+      window.addEventListener('load', function () {
+        inputTodo.focus();
+      });
+
+      function onChangeTodo(e, todoIndex) {
+        todoIndex.value = todoIndex;
+
+        fetch(`/done-todo?index=${todoIndex}`, {
+          method: 'POST',
+        }).then(async (res) => {
+          const responseMessage = await res.text();
+          alert(responseMessage);
+          window.location.reload();
+        });
+      }
+    </script>
+  </body>
+</html>
+
